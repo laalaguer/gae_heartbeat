@@ -1,22 +1,5 @@
-### GAE heartbeat module
+## GAE heartbeat module
 Google App Engine (GAE) `heartbeat` api for various purpose
-
-### GAE queue-related stuff
-Google App Engine (GAE) has produced a lot of good features like:
-
-
-1. `pull queue`, where you can fetch tasks and execute it outside app engine.
-2. `push queue`, where you create task and execute it inside app engine.
-3. `cron job`, where you can schedule tasks that execute periodically.
-
-
-However GAE also has limits:
-
-
-1. `pull queue` is waiting for external worker to pull the queue.
-2. GAE has a `28 instance` hours limit each day, which means you cannot pull frequently.
-3. `push queue` has a timely deadline on each task execution, 60s.  But my task may run for up to 7 days till final success.
-4. `cron job` has the same limit in number 2, which means we cannot pull frequently. Plus, each task is limit to 60s.
 
 ### A Real Problem
 I design this `heartbeat` module to solve this problem:
@@ -28,7 +11,6 @@ I design this `heartbeat` module to solve this problem:
 4. `name` is the name of the `heartbeat`.
 
 How this will work in real life:
-
 
 1. I have a `heartbeat` which `name` is cat.
 2. At 8:00 I adjust it to `is_on=True`, `come_back=5`. So the worker come back every 5mins and do the job.
@@ -43,7 +25,13 @@ How this will work in real life:
 4. GAE frontend instance time is reduced by up to 50%-60%.
 
 ### How to use this module
-1. Include the heartbeat module into your python project.
+1. Include the `heartbeat` module into your python project.
 2. Adjust your frequency by cron jobs and through web apis.
 3. Take a look at `app.yaml` and `main.py` , these are examples.
 4. Dont forget to change your app id inside `app.yaml`
+
+## GAE jobqueue module
+An enhancement of GAE job queue. As a customized queue, it can contain JSON objects as its core data structure.
+### How to Use
+1. Include the `jobqueue` module into your project.
+2. Take a look at `main.py`
