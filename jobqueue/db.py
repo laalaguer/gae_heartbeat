@@ -6,13 +6,14 @@ import random
 class Job(ndb.Model):
     public_hash_id = ndb.StringProperty(default='') # a random job id, for marking purpose.
     add_date = ndb.DateTimeProperty(auto_now_add=True)
-    add_date_str = ndb.StringProperty(default='') # string represent of adding date
+    last_touch_date_str = ndb.StringProperty(default='') # string represent of adding date
 
     payload = ndb.JsonProperty() # job payloads of job requirement. inside can be flexible.
 
     success = ndb.BooleanProperty(default=False) # if job is done or not.
     will_retry = ndb.BooleanProperty(default=True) # if job will be retry if failed.
     fail_reason = ndb.StringProperty(default='') # why the job execution failed.
+    fail_times = ndb.IntegerProperty(default=0) # fail times that the runner report
     
     response = ndb.JsonProperty() # job execution result : justificante, fecha, hora as dict key. inside can be flexible.
 
@@ -23,9 +24,10 @@ class Job(ndb.Model):
         factor_two = str(random.getrandbits(128))
         m.update(factor_one)
         m.update(factor_two)
-        self.public_hash_id = m.hexdigest()
+        if not self.public_hash_id: # if the hash is not available
+            self.public_hash_id = m.hexdigest()
 
-        self.add_date_str = factor_one
+        self.last_touch_date_str = factor_one
 
     @classmethod
     def query_by_hash(cls, hash_value):
@@ -37,9 +39,7 @@ class Job(ndb.Model):
 
 def put_job(payload):
     response = {
-        'justificante' : '',
-        'fecha' : '',
-        'hora' : '',
+        # we make no assumption on the jobs results we want to insert here, leave it to the users
     }
 
     job = Job(payload=payload, response=response)

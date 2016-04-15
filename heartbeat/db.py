@@ -10,7 +10,7 @@ class HeartBeat(ndb.Model):
 
     @classmethod
     def query_whole(cls):
-        ''' fetch the all of data'''
+        ''' fetch the all of data '''
         return cls.query().order(-cls.datetime).fetch()
 
     @classmethod

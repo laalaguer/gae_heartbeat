@@ -41,6 +41,7 @@ class CreateHeartBeatHandler(webapp2.RequestHandler):
 
             self.response.out.write(key_value)
         except:
+            self.error(500)
             self.response.out.write('ERROR')
 
     def post(self):
@@ -55,4 +56,5 @@ class DeleteHeartBeatHandler(webapp2.RequestHandler):
         try:
             self.response.out.write(db.delete_heartbeats(name))
         except:
+            self.error(500)
             self.response.out.write('ERROR')

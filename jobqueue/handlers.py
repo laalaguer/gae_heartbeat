@@ -66,3 +66,60 @@ class DeleteJobHandler(webapp2.RequestHandler):
             self.response.out.write(db.delete_job(str(hash_id)))
         except:
             self.error(500)
+
+# params: 
+class UpdateJobStatusHandler(webapp2.RequestHandler):
+    '''
+    GET /updatejob/<item-id> : public_hash_id
+
+    success - true
+    response - a json object, about the job final result (You decide the content)
+
+    success - false
+    will_retry - true/false
+    fail_reason - a string
+    '''
+    def post(self, hash_id):
+        jsonstring = self.request.body
+        payload = None
+        try:
+            payload = json.loads(jsonstring)
+            if payload['success'] == True:
+                if not payload['response']:
+                    raise Exception('need response - a json object')
+            elif payload['success'] == False:
+                if not (payload['will_retry'] or payload['fail_reason']):
+                    raise Exception('need will_retry, fail_reason')
+            else:
+                raise Exception('success parameter is either boolean true or false')
+        except Exception as ex:
+            self.error(400)
+            self.response.out.write('Your Data Error, ' + str(ex))
+
+
+
+        # step 1, get the job in the queue, but if not found, error 404
+        try:
+            jobs = Job.query_by_hash(str(hash_id)) # an iterator.
+            if len(jobs):
+                for each in jobs: # modify the job status according to the request
+                    # step 2, stuff the job status with new data here.
+                    if payload['success']:
+                        each.success = True
+                        each.response = payload['response']
+                    else:
+                        each.success = False
+                        each.will_retry = payload['will_retry']
+                        each.fail_reason = payload['fail_reason']
+                        each.fail_times = each.fail_times + 1 # add one to the failure times
+                    each.put() # store it into database
+                    self.response.out.write(each.public_hash_id)
+            else:
+                self.error(404)
+                self.response.out.write('Job Not Found')
+        except Exception as ex:
+            self.error(500)
+            self.response.out.write('Database Query Error ' + str(ex))
+
+    def get(self, hash_id):
+        self.post(hash_id)
