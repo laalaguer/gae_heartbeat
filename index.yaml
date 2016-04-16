@@ -15,3 +15,22 @@ indexes:
   - name: name
   - name: datetime
     direction: desc
+
+- kind: Job
+  properties:
+  - name: public_hash_id
+  - name: add_date
+    direction: desc
+
+- kind: Job
+  properties:
+  - name: success
+  - name: will_retry
+  - name: add_date
+    direction: desc
+
+- kind: Job
+  properties:
+  - name: will_retry
+  - name: add_date
+    direction: desc

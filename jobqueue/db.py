@@ -36,6 +36,13 @@ class Job(ndb.Model):
     @classmethod
     def query_whole(cls):
         return cls.query().order(-cls.add_date).fetch()
+    
+    @classmethod
+    def query_whole_by_active(cls, active=True):
+        if active:
+            return cls.query(cls.success==False, cls.will_retry==True).order(-cls.add_date).fetch()
+        else:
+            return cls.query(cls.will_retry==False).order(-cls.add_date).fetch()
 
 def put_job(payload):
     response = {

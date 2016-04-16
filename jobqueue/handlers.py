@@ -23,12 +23,19 @@ class SingleJobJsonHandler(webapp2.RequestHandler):
 
 class AllJobJsonHandler(webapp2.RequestHandler):
     ''' Read all jobs inside the database
-        GET /jobs
+        GET /jobs?active=true,false
         - download json
     '''
     
     def get(self):
-        jobs = Job.query_whole() # an iterator.
+        active = self.request.get('active', None)
+        jobs = None
+        if  active == 'true':
+            jobs = Job.query_whole_by_active(True) # an iterator.
+        elif active == 'false':
+            jobs = Job.query_whole_by_active(False) # an iterator.
+        else:
+            jobs = Job.query_whole()
         json_dict = {}
         json_dict['jobs'] = []
         for job in jobs:

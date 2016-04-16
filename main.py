@@ -17,4 +17,5 @@ app = webapp2.WSGIApplication(routes=[
     webapp2.Route('/job/list', handler=jobqueue.handlers.AllJobJsonHandler),
     webapp2.Route('/job/list/<hash_id>', handler=jobqueue.handlers.SingleJobJsonHandler),
     webapp2.Route('/job/delete/<hash_id>', handler=jobqueue.handlers.DeleteJobHandler),
+    webapp2.Route('/job/update/<hash_id>', handler=jobqueue.handlers.UpdateJobStatusHandler),
 ], debug=True, config=config)
