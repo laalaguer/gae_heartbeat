@@ -13,7 +13,7 @@
     </head>
     
     <body>
-        <div class="container headline" id="heartbeat">
+        <div class="container headline">
             <div class="row">
                 <div class="col-md-4">
                     <div class="panel panel-default">
@@ -51,7 +51,7 @@
                                     <span class="input-group-addon">minutes</span>
                                 </div>
                             </div>
-                            <button class="btn btn-primary center-block" onclick="createHeartBeat()">Submit</button>
+                            <button class="btn btn-primary center-block" id="submitheartbeat">Submit</button>
                         </form>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                                 <textarea class="form-control" rows="15" id="payload" name="payload"></textarea>
                             </div>
                             
-                            <button class="btn btn-primary center-block" onclick="createJob()">Submit</button>
+                            <button class="btn btn-primary center-block" id="submitjob">Submit</button>
                         </form>
                         </div>
                     </div>
@@ -78,21 +78,31 @@
         // delete a job, we refresh the page or hide the element ?
         var MINI = require('minified');
         var _=MINI._, $=MINI.$, $$=MINI.$$, EE=MINI.EE, HTML=MINI.HTML;
-
-        function createHeartBeat(){
-            var result = $.request('get', '/heartbeat/create', $('#heartbeatform').values())
-            document.getElementById("heartbeatform").reset();
-            return false;
-        }
         
-        function createJob(){
+        $('#submitheartbeat').on('click', function() {
+            var result = $.request('get', '/heartbeat/create', $('#heartbeatform').values());
+            result.then(function success(txt) {
+                alert("Got from service: " + txt);
+                document.getElementById("heartbeatform").reset();
+            },
+            function error(status, statusText, responseText) {
+                alert("Error accessing service.");
+            });
+        });
+
+        $('#submitjob').on('click', function() {
             formdata = $('#jobform').values();
-            my_javaobj = $.parseJSON(formdata['payload'].replace(/\s/g, ""))
+            my_javaobj = $.parseJSON(formdata['payload'].replace(/\s/g, ""));
             objjson =  $.toJSON(my_javaobj);
-            var result = $.request('post', '/job/create', objjson, {'Content-Type':'application/json'})
-            document.getElementById("jobform").reset();
-            return false;
-        }
+            var result = $.request('post', '/job/create', objjson, {'Content-Type':'application/json'});
+            result.then(function success(txt) {
+                alert("Got from service: " + txt);
+                document.getElementById("jobform").reset();
+            },
+            function error(status, statusText, responseText) {
+                alert("Error accessing service.");
+            });
+        });
     </script>
     </body>
 </html>
