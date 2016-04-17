@@ -5,6 +5,12 @@ api_version: 1
 threadsafe: yes
 
 handlers:
+- url: /css
+  static_dir: html/css
+
+- url: /js
+  static_dir: html/js
+
 - url: .*
   script: main.app
   secure: always

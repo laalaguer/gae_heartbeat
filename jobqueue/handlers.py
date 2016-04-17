@@ -113,6 +113,7 @@ class UpdateJobStatusHandler(webapp2.RequestHandler):
                     # step 2, stuff the job status with new data here.
                     if payload['success']:
                         each.success = True
+                        each.will_retry = False
                         each.response = payload['response']
                     else:
                         each.success = False

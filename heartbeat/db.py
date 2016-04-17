@@ -2,7 +2,7 @@ from google.appengine.ext import ndb
 
 class HeartBeat(ndb.Model):
     name = ndb.StringProperty(default='default') # name of the heart beat
-    is_on = ndb.IntegerProperty(default=False) # if the worker should be on or not
+    is_on = ndb.IntegerProperty(default=0) # if the worker should be on or not
     come_back = ndb.IntegerProperty(default=5) # default rate for calling this api, in minute.
     each_round_if_success = ndb.IntegerProperty(default=5) # default inter-mission between each crawler round.
     each_round_if_fail = ndb.IntegerProperty(default=5) # default inter-mission between each crawler round.

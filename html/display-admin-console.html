@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Display Admin Console</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+        <link href="/css/normalize.css" rel="stylesheet" type="text/css" />
+        <link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+        <link href="/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
+        <link href="/css/mystyle.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="/js/minified.js" async></script>
+    </head>
+    
+    <body>
+        <div class="container headline" id="heartbeat">
+            <div class="row">
+                <div class="col-md-8"><h1>Heart Beat <small>realtime status </small></h1></div>
+            </div>
+            <div class="row">
+                {% for each in heartbeats_all %}
+                <div class="col-md-4">
+                    {% if each.is_on > 0 %}
+                    <div class="panel panel-success">
+                        <div class="panel-heading">{{ each.name }} - is on
+                        <button  class="btn btn-danger btn-xs pull-right " onclick="deleteHeartBeat('{{ each.name }}')">delete</button>
+                        </div>
+                    {% else %}
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">{{ each.name }} - is off
+                        <button  class="btn btn-danger btn-xs pull-right " onclick="deleteHeartBeat('{{ each.name }}')">delete</button>
+                        </div>
+                    {% endif %}
+                        
+                        <div class="panel-body">come back every {{ each.come_back }} minutes</div>
+                        <div class="panel-footer">
+                            <pre>{{ each.raw_code }}</pre>
+                      </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="container middle-paragraph" id="jobs-alive">
+            <div class="row">
+                <div class="col-md-8"><h1>Jobs <small>active</small></h1></div>
+            </div>
+            <div class="row">
+                {% for each in jobs_active %}
+                <div class="col-md-4">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">{{ each.public_hash_id }}
+                        <button  class="btn btn-danger btn-xs pull-right " onclick="deleteJob('{{ each.public_hash_id }}')">delete</button>
+                        </div>
+                        <div class="panel-body">
+                            <p>{{ each.last_touch_date_str }} <small class="pull-right">fail times - {{ each.fail_times }}</small></p>
+                            <p>fail_reason - {{ each.fail_reason }}</p>
+                            <p>will_retry - {{ each.will_retry }}</p>
+                            <button type="button" class="btn btn-primary btn-lg btn-block" onclick="clickShowHide('{{ each.public_hash_id }}')">Details</button>
+                        </div>
+                        <div class="panel-footer" id="{{ each.public_hash_id }}" style="display:none">
+                        <h5>payload json</h5>
+                        <pre>{{ each.payload_raw_code }}</pre>
+                        <h5>response json</h5>
+                        <pre>{{ each.response }}</pre>
+                      </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="container middle-paragraph" id="jobs-dead">
+            <div class="row">
+                <div class="col-md-8"><h1>Jobs <small>inactive</small></h1></div>
+            </div>
+            <div class="row">
+                {% for each in jobs_dead %}
+                <div class="col-md-4">
+                    {% if each.success %}
+                    <div class="panel panel-success">
+                        <div class="panel-heading">{{ each.public_hash_id }} <button  class="btn btn-danger btn-xs pull-right " onclick="deleteJob('{{ each.public_hash_id }}')">delete</button></div>
+                    {% else %}
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">{{ each.public_hash_id }} <button  class="btn btn-danger btn-xs pull-right" onclick="deleteJob('{{ each.public_hash_id }}')">delete</button></div>
+                    {% endif %}
+                        
+                        <div class="panel-body">
+                            <p>{{ each.last_touch_date_str }}  <small class="pull-right">fail times - {{ each.fail_times }}</small></p>
+                            <p>fail_reason - {{ each.fail_reason }}</p>
+                            <button type="button" class="btn btn-success btn-lg btn-block" onclick="clickShowHide('{{ each.public_hash_id }}')">Details</button>
+                        </div>
+                        <div class="panel-footer" id="{{ each.public_hash_id }}" style="display:none">
+                        <h5>payload json</h5>
+                        <pre>{{ each.payload_raw_code }}</pre>
+                        <h5>response json</h5>
+                        <pre>{{ each.response_raw_code }}</pre>
+                      </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+            
+        
+<script>
+    // a click show switch to show hide details
+function clickShowHide(input_data) {
+    var target_element = document.getElementById(input_data);
+    if(target_element.style.display == "block") {
+        target_element.style.display = "none";
+    }else{
+        target_element.style.display = "block";
+    }
+}
+</script>
+<script>
+    // hide all the job details when load the page
+    $(document).ready(function(){ 
+        var l = $('.job-details');
+        for (x in l) {
+            x.style.display = "none";
+        }
+    });
+</script>
+<script type="text/javascript">
+    // reload windows every 5 mintues
+    setInterval(function() {
+      window.location.reload();
+    }, 5*60000); 
+</script>
+<script type="text/javascript">
+    // delete a job, we refresh the page or hide the element ?
+    var MINI = require('minified');
+    var _=MINI._, $=MINI.$, $$=MINI.$$, EE=MINI.EE, HTML=MINI.HTML;
+    
+    function deleteHeartBeat(input_data){
+        $.request('get', '/heartbeat/delete?name=' + input_data)
+        .then(function(txt) {
+            alert('OK');
+            setTimeout(refreshmypage, 2000); //wait 5 seconds before continuing
+         });
+    }
+    
+    function deleteJob(input_data){
+        $.request('get', '/job/delete/'+input_data)
+        .then(function(txt) {
+            alert('OK');
+            setTimeout(refreshmypage, 2000); //wait 5 seconds before continuing
+         });
+    }
+    
+    function refreshmypage(){
+        window.location.reload();
+    }
+</script>
+    </body>
+</html>

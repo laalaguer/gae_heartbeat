@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <title>Add Admin Console</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+        <link href="/css/normalize.css" rel="stylesheet" type="text/css" />
+        <link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+        <link href="/css/bootstrap-theme.css" rel="stylesheet" type="text/css" />
+        <link href="/css/mystyle.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="/js/minified.js"></script>
+    </head>
+    
+    <body>
+        <div class="container headline" id="heartbeat">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                        <h4>Add Heart Beat <small>one by one</small></h4>
+                        </div>
+                        <div class="panel-body">
+                        <form id="heartbeatform">
+                            <div class="form-group">
+                                <label for="name">name</label>
+                                <input type="text" class="form-control" id="name" placeholder="0" name="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="is_on">On or Off? / 0 or 1?</label>
+                                <input type="number" class="form-control" id="is_on" placeholder="0" name="is_on" min="0" max="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="come_back">Come Back Every:</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="come_back" placeholder="0" name="come_back" min="0" required>
+                                    <span class="input-group-addon">minutes</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="each_round_if_success">Each round if success:</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="each_round_if_success" placeholder="0" name="each_round_if_success" min="0">
+                                    <span class="input-group-addon">minutes</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="each_round_if_fail">Each round if fail:</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="each_round_if_fail" placeholder="0" name="each_round_if_fail" min="0">
+                                    <span class="input-group-addon">minutes</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary center-block" onclick="createHeartBeat()">Submit</button>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><h4>Add Job <small>one by one</small></h4></div>
+                        <div class="panel-body">
+                        <form id="jobform">
+                            <div class="form-group">
+                                <label for="payload">payload json</label>
+                                <textarea class="form-control" rows="15" id="payload" name="payload"></textarea>
+                            </div>
+                            
+                            <button class="btn btn-primary center-block" onclick="createJob()">Submit</button>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <script type="text/javascript">
+        // delete a job, we refresh the page or hide the element ?
+        var MINI = require('minified');
+        var _=MINI._, $=MINI.$, $$=MINI.$$, EE=MINI.EE, HTML=MINI.HTML;
+
+        function createHeartBeat(){
+            var result = $.request('get', '/heartbeat/create', $('#heartbeatform').values())
+            document.getElementById("heartbeatform").reset();
+            return false;
+        }
+        
+        function createJob(){
+            formdata = $('#jobform').values();
+            my_javaobj = $.parseJSON(formdata['payload'].replace(/\s/g, ""))
+            objjson =  $.toJSON(my_javaobj);
+            var result = $.request('post', '/job/create', objjson, {'Content-Type':'application/json'})
+            document.getElementById("jobform").reset();
+            return false;
+        }
+    </script>
+    </body>
+</html>
