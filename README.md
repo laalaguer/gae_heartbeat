@@ -1,6 +1,9 @@
 ## GAE heartbeat module
 Google App Engine (GAE) `heartbeat` api for various purpose
 
+
+### How it works
+![Work Flow Picture](structure.png)
 ### A Real Problem
 I design this `heartbeat` module to solve this problem:
 
