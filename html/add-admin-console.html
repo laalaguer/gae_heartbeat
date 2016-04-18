@@ -66,7 +66,6 @@
                                 <label for="payload">payload json</label>
                                 <textarea class="form-control" rows="15" id="payload" name="payload"></textarea>
                             </div>
-                            
                             <button class="btn btn-primary center-block" id="submitjob">Submit</button>
                         </form>
                         </div>
@@ -91,17 +90,26 @@
         });
 
         $('#submitjob').on('click', function() {
-            formdata = $('#jobform').values();
-            my_javaobj = $.parseJSON(formdata['payload'].replace(/\s/g, ""));
-            objjson =  $.toJSON(my_javaobj);
-            var result = $.request('post', '/job/create', objjson, {'Content-Type':'application/json'});
-            result.then(function success(txt) {
-                alert("Got from service: " + txt);
-                document.getElementById("jobform").reset();
-            },
-            function error(status, statusText, responseText) {
-                alert("Error accessing service.");
-            });
+            var formdata = $('#jobform').values();
+            var my_json_obj;
+            try {
+                var my_json_obj = $.parseJSON(formdata['payload'].replace(/\s/g, ""));
+            }
+            catch(err) {
+                alert('wrong json');
+            }
+            // if the json is valid, then process, if not, alert
+            if (typeof my_json_obj != 'undefined'){
+                objjson =  $.toJSON(my_json_obj);
+                var result = $.request('post', '/job/create', objjson, {'Content-Type':'application/json'});
+                result.then(function success(txt) {
+                    alert("Success! Got from service: " + txt);
+                    document.getElementById("jobform").reset();
+                },
+                function error(status, statusText, responseText) {
+                    alert("Error accessing service.");
+                });
+            }
         });
     </script>
     </body>
